@@ -1,0 +1,70 @@
+name: Development Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build YT Converter IPA
+    permissions:
+      contents: write
+    runs-on: macos-15
+
+    steps:
+      - name: Remove work folders
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+
+      - name: Checkout repository
+        uses: actions/checkout@main
+
+      - name: Set up Xcode version
+        uses: maxim-lobanov/setup-xcode@master
+        with:
+          xcode-version: '26.1'
+
+      - name: Install build tools
+        run: |
+          brew install xcodegen ldid
+
+      - name: Download yt-dlp binary
+        run: |
+          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos \
+            -o YTConverter/Resources/yt-dlp
+          chmod +x YTConverter/Resources/yt-dlp
+
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+
+      - name: Build app (unsigned)
+        run: |
+          xcodebuild \
+            -project YTConverter.xcodeproj \
+            -scheme YTConverter \
+            -configuration Release \
+            -sdk iphoneos \
+            -arch arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE="" \
+            DEVELOPMENT_TEAM="" \
+            -derivedDataPath build/
+
+      - name: Package IPA
+        run: |
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -1)
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r YTConverter.ipa Payload/
+          mkdir -p artifacts
+          mv YTConverter.ipa artifacts/com.khinphunnadet.ytconverter.ipa
+
+      - name: Sign with ldid
+        run: ldid -S artifacts/com.khinphunnadet.ytconverter.ipa || true
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@main
+        with:
+          name: com.khinphunnadet.ytconverter.ipa
+          path: artifacts/com.khinphunnadet.ytconverter.ipa

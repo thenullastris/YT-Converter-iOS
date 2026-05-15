@@ -1,0 +1,55 @@
+name: YTConverter
+options:
+  bundleIdPrefix: com.khinphunnadet
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.khinphunnadet.ytconverter
+    MARKETING_VERSION: 1.0.0
+    CURRENT_PROJECT_VERSION: 1
+    SWIFT_VERSION: 5.9
+    IPHONEOS_DEPLOYMENT_TARGET: 16.0
+    TARGETED_DEVICE_FAMILY: 1
+    ENABLE_BITCODE: NO
+    DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGN_IDENTITY: ""
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  YTConverter:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: YTConverter
+        includes:
+          - "**/*.swift"
+    resources:
+      - path: YTConverter/Resources
+        includes:
+          - "**/*"
+    info:
+      path: YTConverter/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: YT Converter
+        CFBundleIdentifier: com.khinphunnadet.ytconverter
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        NSPhotoLibraryAddUsageDescription: "YT Converter needs access to save videos to your photo library."
+        UILaunchStoryboardName: LaunchScreen
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIUserInterfaceStyle: Dark
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.khinphunnadet.ytconverter
+        INFOPLIST_FILE: YTConverter/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
