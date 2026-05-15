@@ -1,15 +1,12 @@
 name: Development Build
-
 on:
   workflow_dispatch:
-
 jobs:
   build:
     name: Build YT Converter IPA
     permissions:
       contents: write
     runs-on: macos-15
-
     steps:
       - name: Remove work folders
         run: |
@@ -22,7 +19,7 @@ jobs:
       - name: Set up Xcode version
         uses: maxim-lobanov/setup-xcode@master
         with:
-          xcode-version: '26.1'
+          xcode-version: 'latest'
 
       - name: Install build tools
         run: |
@@ -30,6 +27,7 @@ jobs:
 
       - name: Download yt-dlp binary
         run: |
+          mkdir -p YTConverter/Resources
           curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos \
             -o YTConverter/Resources/yt-dlp
           chmod +x YTConverter/Resources/yt-dlp
@@ -51,6 +49,11 @@ jobs:
             DEVELOPMENT_TEAM="" \
             -derivedDataPath build/
 
+      - name: Sign with ldid
+        run: |
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -1)
+          ldid -S "$APP_PATH/YTConverter" || true
+
       - name: Package IPA
         run: |
           APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -1)
@@ -59,9 +62,6 @@ jobs:
           zip -r YTConverter.ipa Payload/
           mkdir -p artifacts
           mv YTConverter.ipa artifacts/com.khinphunnadet.ytconverter.ipa
-
-      - name: Sign with ldid
-        run: ldid -S artifacts/com.khinphunnadet.ytconverter.ipa || true
 
       - name: Upload IPA
         uses: actions/upload-artifact@main
