@@ -37,43 +37,38 @@ class DownloadViewModel: ObservableObject {
             downloadState = .error("Please enter a valid YouTube URL")
             return
         }
-
-        Task {
-            await performDownload(urlString: trimmed)
-        }
+        Task { await performDownload(urlString: trimmed) }
     }
 
     private func performDownload(urlString: String) async {
         downloadState = .fetching
 
         do {
-            let cobaltResponse = try await CobaltService.shared.fetchDownloadURL(
+            let response = try await DownloadService.shared.fetchDownloadURL(
                 youtubeURL: urlString,
                 mediaType: selectedMediaType,
                 quality: selectedQuality
             )
 
-            let validStatuses = ["tunnel", "redirect", "stream", "picker"]
-            guard validStatuses.contains(cobaltResponse.status),
-                  let downloadURL = cobaltResponse.url else {
-                let msg = cobaltResponse.error?.code ?? cobaltResponse.text ?? "cobalt error: \(cobaltResponse.status)"
+            guard response.success == true,
+                  let data = response.data,
+                  let downloadURL = data.downloadUrl else {
+                let msg = response.message ?? "Failed to get download link"
                 downloadState = .error(msg)
                 return
             }
 
             downloadState = .downloading(progress: 0)
 
-            let filename = cobaltResponse.filename ?? "download"
-            let cleanFilename = (filename as NSString).deletingPathExtension
-
-            let fileURL = try await CobaltService.shared.downloadFile(
+            let title = data.title ?? "download"
+            let fileURL = try await DownloadService.shared.downloadFile(
                 from: downloadURL,
-                filename: cleanFilename,
+                filename: title,
                 mediaType: selectedMediaType
             )
 
             let item = DownloadItem(
-                title: cleanFilename,
+                title: title,
                 url: urlString,
                 mediaType: selectedMediaType.rawValue,
                 quality: selectedQuality.label
@@ -90,9 +85,7 @@ class DownloadViewModel: ObservableObject {
         }
     }
 
-    func clearError() {
-        downloadState = .idle
-    }
+    func clearError() { downloadState = .idle }
 
     func deleteHistoryItem(id: UUID) {
         HistoryService.shared.delete(id: id)

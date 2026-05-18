@@ -19,7 +19,7 @@ enum MediaType: String, CaseIterable, Identifiable {
 }
 
 enum VideoQuality: String, CaseIterable, Identifiable {
-    case best = "max"
+    case best = "1080"
     case hd720 = "720"
     case sd480 = "480"
     case sd360 = "360"
@@ -44,24 +44,25 @@ struct DownloadItem: Identifiable, Codable {
     var fileURL: String?
 
     init(id: UUID = UUID(), title: String, url: String, mediaType: String, quality: String, date: Date = Date(), fileURL: String? = nil) {
-        self.id = id
-        self.title = title
-        self.url = url
-        self.mediaType = mediaType
-        self.quality = quality
-        self.date = date
-        self.fileURL = fileURL
+        self.id = id; self.title = title; self.url = url
+        self.mediaType = mediaType; self.quality = quality
+        self.date = date; self.fileURL = fileURL
     }
 }
 
-struct CobaltResponse: Codable {
-    let status: String
-    let url: String?
-    let filename: String?
-    let text: String?
-    let error: CobaltError?
+struct DownloadResponse: Codable {
+    let success: Bool?
+    let data: DownloadData?
+    let message: String?
 
-    struct CobaltError: Codable {
-        let code: String?
+    struct DownloadData: Codable {
+        let title: String?
+        let downloadUrl: String?
+        let fileSize: Int?
+        let fileSizeMB: String?
+        let format: String?
+        let quality: String?
+        let thumbnail: String?
+        let duration: String?
     }
 }
