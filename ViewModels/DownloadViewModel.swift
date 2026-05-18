@@ -53,9 +53,10 @@ class DownloadViewModel: ObservableObject {
                 quality: selectedQuality
             )
 
-            guard cobaltResponse.status == "tunnel" || cobaltResponse.status == "redirect",
+            let validStatuses = ["tunnel", "redirect", "stream", "picker"]
+            guard validStatuses.contains(cobaltResponse.status),
                   let downloadURL = cobaltResponse.url else {
-                let msg = cobaltResponse.text ?? "cobalt returned an error"
+                let msg = cobaltResponse.error?.code ?? cobaltResponse.text ?? "cobalt error: \(cobaltResponse.status)"
                 downloadState = .error(msg)
                 return
             }

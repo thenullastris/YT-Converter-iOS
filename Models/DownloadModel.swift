@@ -59,4 +59,9 @@ struct CobaltResponse: Codable {
     let url: String?
     let filename: String?
     let text: String?
+    let error: CobaltError?
+
+    struct CobaltError: Codable {
+        let code: String?
+    }
 }

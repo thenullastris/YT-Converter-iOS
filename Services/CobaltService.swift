@@ -13,6 +13,7 @@ class CobaltService {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("YTConverter-iOS/1.0", forHTTPHeaderField: "User-Agent")
 
         var body: [String: Any] = [
             "url": youtubeURL,
