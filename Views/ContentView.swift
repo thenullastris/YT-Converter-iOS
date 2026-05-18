@@ -95,8 +95,8 @@ struct ContentView: View {
                     .foregroundStyle(.white.opacity(0.4))
 
                 TextField("", text: $vm.urlInput, prompt: Text("Paste YouTube URL")
-                    .foregroundStyle(.white.opacity(0.3)))
-                    .foregroundStyle(.white)
+                    .foregroundColor(.white.opacity(0.3)))
+                    .foregroundColor(.white)
                     .font(.system(size: 15))
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
